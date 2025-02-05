@@ -1,165 +1,183 @@
 import React, { useState } from "react";
-import '../index.css';
+import "../index.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddForm = () => {
-  const [productName, setProductName] = useState("");
-  const [productCategory, setProductCategory] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [price, setPrice] = useState("");
-  const [company, setCompany] = useState("");
-  const [model, setModel] = useState("");
-  const [purchaseDate, setPurchaseDate] = useState("");
+  const notify = () =>
+    toast.success("Product added successfully!", {
+      style: { backgroundColor: "green", color: "white" },
+    });
+    toast.error("Please fill out the field",{
+      style:{backgroundColor:"red",color: "white"}
+    })
+
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    company: "",
+    quantity: "",
+    price: "",
+    model: "",
+    purchaseDate: "",
+  });
+
   const [products, setProducts] = useState([]);
-  const [action,setAction]=useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleAddForm = (e) => {
     e.preventDefault();
-    const newProduct = {
-      id: products.length + 1,
-      category: productCategory,
-      name: productName,
-      quantity,
-      price,
-      company,
-      model,
-      purchaseDate,
-      action,
-    };
-    
-   
-
-    setProducts([...products, newProduct]); 
-    console.log("Product Added:", newProduct);
-
-    setProductName("");
-    setProductCategory("");
-    setCompany("");
-    setQuantity("");
-    setModel("");
-    setPrice("");
-    setCompany("");
-    setPurchaseDate("");
-    setAction("");
-
-
+    setProducts([...products, { id: products.length + 1, ...formData }]);
+    setFormData({
+      name: "",
+      category: "",
+      company: "",
+      quantity: "",
+      price: "",
+      model: "",
+      purchaseDate: "",
+    });
+    notify();
   };
-  const handleEdit=(id)=>{
-    const product=products.find(p=>p.id===id);
-    setProductName(product.name);
-    setProductCategory(product.category);
-    setCompany(product.company);
-    setModel(product.model);
-    setPrice(product.price);
-    setPurchaseDate(product.purchaseDate);
-    setProducts(products.filter(p=>p.id!=id));
 
-  }
+  const handleEdit = (id) => {
+    const product = products.find((p) => p.id === id);
+    setFormData(product);
+    setProducts(products.filter((p) => p.id !== id));
+  };
+
   const handleDelete = (id) => {
-    setProducts(products.filter(p => p.id !== id));
+    setProducts(products.filter((p) => p.id !== id));
   };
-
 
   return (
     <div className="items-center">
-      <form action="" className="px-10" onSubmit={handleAddForm}>
+      <form className="px-10" onSubmit={handleAddForm}>
         <div className="grid grid-cols-1">
           <input
             type="text"
+            name="name"
             placeholder="Product Name"
-            value={productName}
+            value={formData.name}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setProductName(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="grid grid-cols-1">
           <input
             type="text"
+            name="category"
             placeholder="Product Category"
-            value={productCategory}
+            value={formData.category}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setProductCategory(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="grid grid-cols-1">
           <input
             type="text"
+            name="company"
             placeholder="Company"
-            value={company}
+            value={formData.company}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setCompany(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
-
         <div className="grid grid-cols-1">
           <input
             type="text"
+            name="quantity"
             placeholder="Quantity"
-            value={quantity}
+            value={formData.quantity}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setQuantity(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="grid grid-cols-1">
           <input
             type="text"
+            name="price"
             placeholder="Price"
-            value={price}
+            value={formData.price}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="grid grid-cols-1">
           <input
             type="text"
+            name="model"
             placeholder="Model"
-            value={model}
+            value={formData.model}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setModel(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="grid grid-cols-1">
           <input
             type="date"
+            name="purchaseDate"
             placeholder="Purchase Date"
-            value={purchaseDate}
+            value={formData.purchaseDate}
             className="p-2 border border-gray-300 rounded"
-            onChange={(e) => setPurchaseDate(e.target.value)}
+            onChange={handleChange}
+            required
           />
         </div>
         <button type="submit" className="mt-4 bg-blue-500 text-white p-2 rounded">
           Add Product
         </button>
       </form>
-      <div className=" px-10 py-5">
-        <table className="min-w-full border-collapse border border-gray-200 mr-10">
-         
-            <thead className="  text-2xl">
-            <tr className="">
-              <td className="border-2 px-2 ">Sn</td>
+
+      <ToastContainer />
+
+      <div className="px-10 py-5">
+        <table className="min-w-full border-collapse border border-gray-200">
+          <thead className="text-2xl">
+            <tr>
+              <td className="border-2 px-2">Sn</td>
               <td className="border-2 px-2">Name</td>
-              <td className="border-2 px-2">Catagory</td>
+              <td className="border-2 px-2">Category</td>
               <td className="border-2 px-2">Company</td>
               <td className="border-2 px-2">Model</td>
               <td className="border-2 px-2">Price</td>
               <td className="border-2 px-2">Purchase Date</td>
               <td className="border-2 px-2">Action</td>
-              
-              </tr>
-
-            </thead>
-        
+            </tr>
+          </thead>
           <tbody>
-            {products.map((product,index)=>(
+            {products.map((product, index) => (
               <tr key={product.id}>
-                <td className="border-2 px-2 py-4 ">{index+1}</td>
-                <td className="border-2 px-2 ">{product.name}</td>
-                <td className="border-2 px-2 ">{product.category}</td>
-                <td className="border-2 px-2 ">{product.company}</td>
-                <td className="border-2 px-2 ">{product.model}</td>
-                <td className="border-2 px-2 ">{product.price}</td>
-                <td className="border-2 px-2 ">{product.purchaseDate}</td>
-                <td className="border-2 px-2  space-x-2"><button onClick={()=>handleEdit(product.id) } className="p-2 bg-red-600 rounded-lg px-4 text-white">Edit</button>
-              <button onClick={()=>handleDelete(product.id) } className="p-2 bg-red-600 rounded-lg px-4 text-white">Delete</button></td>
+                <td className="border-2 px-2 py-4">{index + 1}</td>
+                <td className="border-2 px-2">{product.name}</td>
+                <td className="border-2 px-2">{product.category}</td>
+                <td className="border-2 px-2">{product.company}</td>
+                <td className="border-2 px-2">{product.model}</td>
+                <td className="border-2 px-2">{product.price}</td>
+                <td className="border-2 px-2">{product.purchaseDate}</td>
+                <td className="border-2 px-2 space-x-2">
+                  <button
+                    onClick={() => handleEdit(product.id)}
+                    className="p-2 bg-yellow-500 rounded-lg px-4 text-white"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product.id)}
+                    className="p-2 bg-red-600 rounded-lg px-4 text-white"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

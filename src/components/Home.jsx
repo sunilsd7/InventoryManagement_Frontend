@@ -3,7 +3,7 @@ import "../index.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Home = () => {
+const home = () => {
   const notify = () =>
     toast.success("Product added successfully!", {
       style: { backgroundColor: "green", color: "white" },
@@ -187,4 +187,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default home;

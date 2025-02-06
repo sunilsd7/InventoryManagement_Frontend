@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import "../index.css";
-import { ToastContainer, toast } from "react-toastify";
+
+import {  toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const AddForm = () => {
-  const notify = () =>
-    toast.success("Product added successfully!", {
-      style: { backgroundColor: "green", color: "white" },
-    });
-    toast.error("Please fill out the field",{
-      style:{backgroundColor:"red",color: "white"}
-    })
+ 
 
   const [formData, setFormData] = useState({
     name: "",
@@ -30,29 +25,33 @@ const AddForm = () => {
 
   const handleAddForm = (e) => {
     e.preventDefault();
+
+    if(!formData.name||!formData.category||!formData.company||!formData.quantity||!formData.price||!formData.model||!formData.purchaseDate){
+      toast.error("Please fill out all fields before submitting.")
+      return;
+    }
+    else{
+      toast.success("Product added sucessfully!")
+    }
     setProducts([...products, { id: products.length + 1, ...formData }]);
-    setFormData({
-      name: "",
-      category: "",
-      company: "",
-      quantity: "",
-      price: "",
-      model: "",
-      purchaseDate: "",
-    });
-    notify();
+  
   };
 
   const handleEdit = (id) => {
     const product = products.find((p) => p.id === id);
     setFormData(product);
+    
     setProducts(products.filter((p) => p.id !== id));
   };
 
   const handleDelete = (id) => {
     setProducts(products.filter((p) => p.id !== id));
+    if(handleDelete){
+      toast.success("Product deleted sucessfully!")
+    }
+  
   };
-
+  
   return (
     <div className="items-center">
       <form className="px-10" onSubmit={handleAddForm}>
@@ -64,7 +63,7 @@ const AddForm = () => {
             value={formData.name}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+           
           />
         </div>
         <div className="grid grid-cols-1">
@@ -75,7 +74,7 @@ const AddForm = () => {
             value={formData.category}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+            
           />
         </div>
         <div className="grid grid-cols-1">
@@ -86,7 +85,7 @@ const AddForm = () => {
             value={formData.company}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+           
           />
         </div>
         <div className="grid grid-cols-1">
@@ -97,7 +96,7 @@ const AddForm = () => {
             value={formData.quantity}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+            
           />
         </div>
         <div className="grid grid-cols-1">
@@ -108,7 +107,7 @@ const AddForm = () => {
             value={formData.price}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+          
           />
         </div>
         <div className="grid grid-cols-1">
@@ -119,7 +118,7 @@ const AddForm = () => {
             value={formData.model}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+           
           />
         </div>
         <div className="grid grid-cols-1">
@@ -130,7 +129,7 @@ const AddForm = () => {
             value={formData.purchaseDate}
             className="p-2 border border-gray-300 rounded"
             onChange={handleChange}
-            required
+           
           />
         </div>
         <button type="submit" className="mt-4 bg-blue-500 text-white p-2 rounded">
@@ -138,7 +137,7 @@ const AddForm = () => {
         </button>
       </form>
 
-      <ToastContainer />
+ 
 
       <div className="px-10 py-5">
         <table className="min-w-full border-collapse border border-gray-200">

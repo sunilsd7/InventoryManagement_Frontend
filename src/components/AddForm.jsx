@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "../index.css";
+import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -18,17 +18,24 @@ const AddForm = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
+ 
+  useEffect(() => {
+    const savedProducts = Cookies.get("products");
+    if (savedProducts) {
+      setProducts(JSON.parse(savedProducts)); 
+    }
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const saveToCookies = (data) => {
+    Cookies.set("products", JSON.stringify(data)); 
+  };
+
   const handleAddForm = (e) => {
     e.preventDefault();
-
-    if (!formData.name || !formData.category || !formData.company || !formData.quantity || !formData.price || !formData.model || !formData.purchaseDate) {
-      toast.error("Please fill out all fields before submitting.");
-      return;
-    }
 
     const newProduct = {
       id: isEditing ? editId : Date.now(),
@@ -37,15 +44,19 @@ const AddForm = () => {
       price: Number(formData.price),
     };
 
+    let updatedProducts;
     if (isEditing) {
-      setProducts(products.map((p) => (p.id === editId ? newProduct : p)));
+      updatedProducts = products.map((p) => (p.id === editId ? newProduct : p));
       toast.success("Product updated successfully!");
       setIsEditing(false);
       setEditId(null);
     } else {
-      setProducts([...products, newProduct]);
+      updatedProducts = [...products, newProduct];
       toast.success("Product added successfully!");
     }
+
+    setProducts(updatedProducts);
+    saveToCookies(updatedProducts);
 
     setFormData({
       name: "",
@@ -66,89 +77,133 @@ const AddForm = () => {
   };
 
   const handleDelete = (id) => {
-    setProducts(products.filter((p) => p.id !== id));
+    const updatedProducts = products.filter((p) => p.id !== id);
+    setProducts(updatedProducts);
+    saveToCookies(updatedProducts);
     toast.success("Product deleted successfully!");
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-5">
-    
-      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-center mb-4 text-gray-700">
-          {isEditing ? "Edit Product" : "Add Product"}
-        </h2>
-        <form className="space-y-4" onSubmit={handleAddForm}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {["name", "category", "company", "model"].map((field) => (
-              <input
-                key={field}
-                type="text"
-                name={field}
-                placeholder={`Product ${field.charAt(0).toUpperCase() + field.slice(1)}`}
-                value={formData[field]}
-                className="p-3 border rounded-lg w-full focus:ring focus:ring-blue-300"
-                onChange={handleChange}
-              />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col items-center ">
+      
+
+      <div className="bg-white  rounded-lg p-6 w-full max-w-lg ">
+        <p className="text-xl font-bold text-center mb-4 text-gray-700">
+          {isEditing ? "Edit Product" : "Add New Product"}
+        </p>
+
+        <form className="space-y-2  " onSubmit={handleAddForm}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={formData.name}
+              className="p-2 border rounded-lg w-full"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              name="category"
+              placeholder="Category"
+              value={formData.category}
+              className="p-2 border rounded-lg w-full"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              name="company"
+              placeholder="Company"
+              value={formData.company}
+              className="p-2 border rounded-lg w-full"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              name="model"
+              placeholder="Model"
+              value={formData.model}
+              className="p-2 border rounded-lg w-full"
+              onChange={handleChange}
+              required
+            />
             <input
               type="number"
               name="quantity"
               placeholder="Quantity"
               value={formData.quantity}
-              className="p-3 border rounded-lg w-full focus:ring focus:ring-blue-300"
+              className="p-2 border rounded-lg w-full"
               onChange={handleChange}
+              required
             />
             <input
               type="number"
               name="price"
               placeholder="Price"
               value={formData.price}
-              className="p-3 border rounded-lg w-full focus:ring focus:ring-blue-300"
+              className="p-2 border rounded-lg w-full"
               onChange={handleChange}
+              required
             />
           </div>
           <input
             type="date"
             name="purchaseDate"
             value={formData.purchaseDate}
-            className="p-3 border rounded-lg w-full focus:ring focus:ring-blue-300"
+            className="p-3 border rounded-lg w-full"
             onChange={handleChange}
+            required
           />
-          <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg transition">
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg"
+          >
             {isEditing ? "Update Product" : "Add Product"}
           </button>
         </form>
       </div>
 
       {products.length > 0 && (
-        <div className="w-full max-w-5xl mt-10 overflow-x-auto">
+        <div className="w-full mt-10 overflow-x-auto">
           <table className="w-full bg-white shadow-lg rounded-lg overflow-hidden">
             <thead className="bg-blue-500 text-white">
               <tr>
-                {["SN", "Name", "Category", "Company", "Model", "Price", "Purchase Date", "Action"].map((header) => (
-                  <th key={header} className="px-4 py-3 text-left">
-                    {header}
-                  </th>
-                ))}
+                <th className="px-4 py-3 text-left border">SN</th>
+                <th className="px-4 py-3 text-left border">Name</th>
+                <th className="px-4 py-3 text-left border">Category</th>
+                <th className="px-4 py-3 text-left border">Company</th>
+                <th className="px-4 py-3 text-left border">Model</th>
+                <th className="px-4 py-3 text-left border">Quantity</th>
+                <th className="px-4 py-3 text-left border">Price ($)</th>
+                <th className="px-4 py-3 text-left border">Purchase Date</th>
+                <th className="px-4 py-3 text-left border">Action</th>
               </tr>
             </thead>
             <tbody>
               {products.map((product, index) => (
-                <tr key={product.id} className="border-b hover:bg-gray-100">
-                  <td className="px-4 py-3">{index + 1}</td>
-                  <td className="px-4 py-3">{product.name}</td>
-                  <td className="px-4 py-3">{product.category}</td>
-                  <td className="px-4 py-3">{product.company}</td>
-                  <td className="px-4 py-3">{product.model}</td>
-                  <td className="px-4 py-3">${product.price}</td>
-                  <td className="px-4 py-3">{product.purchaseDate}</td>
-                  <td className="px-4 py-3 flex gap-2">
-                    <button onClick={() => handleEdit(product.id)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition">
+                <tr key={product.id} className="hover:bg-gray-100">
+                  <td className="px-4 py-3 border">{index + 1}</td>
+                  <td className="px-4 py-3 border">{product.name}</td>
+                  <td className="px-4 py-3 border">{product.category}</td>
+                  <td className="px-4 py-3 border">{product.company}</td>
+                  <td className="px-4 py-3 border">{product.model}</td>
+                  <td className="px-4 py-3 border">{product.quantity}</td>
+                  <td className="px-4 py-3 border">{product.price}</td>
+                  <td className="px-4 py-3 border">{product.purchaseDate}</td>
+                  <td className="px-4 py-3 flex gap-2 border">
+                    <button
+                      onClick={() => handleEdit(product.id)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
+                    >
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(product.id)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                    >
                       Delete
                     </button>
                   </td>

@@ -11,11 +11,11 @@ function App() {
     <>
     <div>
       <ToastContainer 
-      position='top-center'
+     
       reverseOrder={false}
       />
     </div>
-     <div className='text-center font-bold text-4xl py-5'>Hello Inventory Management System</div>
+    
      <Home/>
     </>
   )
